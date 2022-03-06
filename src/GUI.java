@@ -28,6 +28,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	private final int maxDelay = 500;
 	private final int initDelay = 100;
 	private boolean running = false;
+	private int type = 1;
 
 	public GUI(JFrame jf) {
 		frame = jf;
@@ -83,11 +84,19 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(timer)) {
 			iterNum++;
-			frame.setTitle("Game of Life (" + Integer.toString(iterNum) + " iteration)");
-			board.iteration();
+			if (type == 1){
+				frame.setTitle("Game of Life (" + Integer.toString(iterNum) + " iteration)");
+				board.iteration(1);
+			}
+			else if (type == 2){
+				frame.setTitle("Rain (" + Integer.toString(iterNum) + " iteration)");
+				board.iteration(2);
+			}
+
 		} else {
 			String command = e.getActionCommand();
 			if (command.equals("Start game of life")) {
+				type = 1;
 				if (!running) {
 					timer.start();
 					start.setText("Pause");
@@ -99,17 +108,17 @@ public class GUI extends JPanel implements ActionListener, ChangeListener {
 				clear.setEnabled(true);
 
 			}
-			if (command.equals("Start rain")) {
+			else if (command.equals("Start rain")) {
+				type = 2;
 				if (!running) {
 					timer.start();
-					start.setText("Pause");
+					rain.setText("Pause");
 				} else {
 					timer.stop();
-					start.setText("Start rain");
+					rain.setText("Start rain");
 				}
 				running = !running;
 				clear.setEnabled(true);
-
 			}
 			else if (command.equals("clear")) {
 				iterNum = 0;

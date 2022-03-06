@@ -18,6 +18,7 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private static final long serialVersionUID = 1L;
 	private Point[][] points;
 	private int size = 14;
+	private int type = 1;
 
 	public Board(int length, int height) {
 		addMouseListener(this);
@@ -27,11 +28,28 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 		setOpaque(true);
 	}
 
+	private void setType(int type){
+		if (this.type != type){
+			this.type = type;
+			initialize(points.length,points[0].length);
+		}
+	}
+
 	// single iteration
-	public void iteration() {
+	public void iteration(int type) {
+		setType(type);
+		if (type == 2){
+			for (int x = 0; x < points.length; ++x){
+				for (int y = 0; y < points[x].length; ++y){
+					if (y == 0) {
+						points[x][y].drop();
+					}
+				}
+			}
+		}
 		for (int x = 0; x < points.length; ++x)
 			for (int y = 0; y < points[x].length; ++y)
-				points[x][y].calculateNewState();
+				points[x][y].calculateNewState(type);
 
 		for (int x = 0; x < points.length; ++x)
 			for (int y = 0; y < points[x].length; ++y)
@@ -51,18 +69,31 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 	private void initialize(int length, int height) {
 		points = new Point[length][height];
 		int[][] neigh = new int[][]{{1, 0}, {0, 1}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}, {-1, 0}, {0, -1}};
-		for (int x = 0; x < points.length; ++x)
-			for (int y = 0; y < points[x].length; ++y)
+		for (int x = 0; x < points.length; ++x){
+			for (int y = 0; y < points[x].length; ++y){
 				points[x][y] = new Point();
-
-		for (int x = 0; x < points.length; ++x) {
-			for (int y = 0; y < points[x].length; ++y) {
-				//TODO: initialize the neighborhood of points[x][y] cell
-				for(int i = 0;i < 8; ++i)
-				{
-					if(x + neigh[i][0] < length && y + neigh[i][1] < height && x + neigh[i][0] >= 0 && y + neigh[i][1] >= 0){
-						points[x][y].addNeighbor(points[x + neigh[i][0]][y + neigh[i][1]]);
+			}
+		}
+		if (type == 1){
+			for (int x = 0; x < points.length; ++x) {
+				for (int y = 0; y < points[x].length; ++y) {
+					//TODO: initialize the neighborhood of points[x][y] cell
+					for(int i = 0;i < 8; ++i)
+					{
+						if(x + neigh[i][0] < length && y + neigh[i][1] < height && x + neigh[i][0] >= 0 && y + neigh[i][1] >= 0){
+							points[x][y].addNeighbor(points[x + neigh[i][0]][y + neigh[i][1]]);
+						}
 					}
+				}
+			}
+		}
+		if (type == 2){
+			for (int x = 0; x < points.length; ++x) {
+				for (int y = 0; y < points[x].length; ++y) {
+					//TODO: initialize the neighborhood of points[x][y] cell
+						if(y - 1 >= 0){
+							points[x][y].addNeighbor(points[x][y - 1]);
+						}
 				}
 			}
 		}
@@ -97,31 +128,61 @@ public class Board extends JComponent implements MouseInputListener, ComponentLi
 			g.drawLine(firstX, y, lastX, y);
 			y += gridSpace;
 		}
-
-		for (x = 0; x < points.length; ++x) {
-			for (y = 0; y < points[x].length; ++y) {
-				if (points[x][y].getState() != 0) {
-					switch (points[x][y].getState()) {
-					case 1:
-						g.setColor(new Color(0x0000ff));
-						break;
-					case 2:
-						g.setColor(new Color(0x00ff00));
-						break;
-					case 3:
-						g.setColor(new Color(0xff0000));
-						break;						
-					case 4:
-						g.setColor(new Color(0x000000));
-						break;						
-					case 5:
-						g.setColor(new Color(0x444444));
-						break;						
-					case 6:
-						g.setColor(new Color(0xffffff));
-						break;						
+		if (type == 1){
+			for (x = 0; x < points.length; ++x) {
+				for (y = 0; y < points[x].length; ++y) {
+					if (points[x][y].getState() != 0) {
+						switch (points[x][y].getState()) {
+							case 1:
+								g.setColor(new Color(0x0000ff));
+								break;
+							case 2:
+								g.setColor(new Color(0x00ff00));
+								break;
+							case 3:
+								g.setColor(new Color(0xff0000));
+								break;
+							case 4:
+								g.setColor(new Color(0x000000));
+								break;
+							case 5:
+								g.setColor(new Color(0x444444));
+								break;
+							case 6:
+								g.setColor(new Color(0xffffff));
+								break;
+						}
+						g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
 					}
-					g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
+				}
+			}
+		}
+		if (type == 2){
+			for (x = 0; x < points.length; ++x) {
+				for (y = 0; y < points[x].length; ++y) {
+					if (points[x][y].getState() != 0) {
+						switch (points[x][y].getState()) {
+							case 6:
+								g.setColor(new Color(0x0000ff));
+								break;
+							case 5:
+								g.setColor(new Color(0x577dff));
+								break;
+							case 4:
+								g.setColor(new Color(0xa7896ff));
+								break;
+							case 3:
+								g.setColor(new Color(0x99afff));
+								break;
+							case 2:
+								g.setColor(new Color(0xa9bcff));
+								break;
+							case 1:
+								g.setColor(new Color(0xb9c9fe));
+								break;
+						}
+						g.fillRect((x * size) + 1, (y * size) + 1, (size - 1), (size - 1));
+					}
 				}
 			}
 		}

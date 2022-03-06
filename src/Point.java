@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Point {
 	private ArrayList<Point> neighbors;
@@ -28,23 +29,33 @@ public class Point {
 		currentState = s;
 	}
 
-	public void calculateNewState() {
+	public void calculateNewState(int type) {
 		//TODO: insert logic which updates according to currentState and 
 		//number of active neighbors
-		if (currentState == 0){
-			if (calculateNumberOfActiveNeighbors() == 3){
-				nextState = 1;
+		if (type == 1){
+			if (currentState == 0){
+				if (calculateNumberOfActiveNeighbors() == 3){
+					nextState = 1;
+				}
+				else{
+					nextState = 0;
+				}
 			}
-			else{
-				nextState = 0;
+			if (currentState == 1){
+				if (calculateNumberOfActiveNeighbors() != 2 && calculateNumberOfActiveNeighbors() != 3){
+					nextState = 0;
+				}
+				else{
+					nextState = 1;
+				}
 			}
 		}
-		if (currentState == 1){
-			if (calculateNumberOfActiveNeighbors() != 2 && calculateNumberOfActiveNeighbors() != 3){
-				nextState = 0;
+		if (type == 2){
+			if (currentState > 0){
+				nextState = currentState - 1;
 			}
-			else{
-				nextState = 1;
+			else if (currentState == 0 && neighbors.size() != 0 && neighbors.get(0).getState() > 0){
+				nextState = 6;
 			}
 		}
 	}
@@ -66,5 +77,14 @@ public class Point {
 			}
 		}
 		return res;
+	}
+
+	public void drop(){
+		Random rand = new Random();
+		int x = rand.nextInt(20);
+		if (x==5){
+			currentState = 6;
+		}
+
 	}
 }
